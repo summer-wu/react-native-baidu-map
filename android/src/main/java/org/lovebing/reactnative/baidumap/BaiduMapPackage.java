@@ -10,6 +10,7 @@ package org.lovebing.reactnative.baidumap;
 import android.os.Looper;
 import android.support.annotation.MainThread;
 
+import java.lang.annotation.Native;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class BaiduMapPackage implements ReactPackage {
 
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-        return Arrays.asList(
+        return Arrays.<NativeModule>asList(
                 new BaiduMapManager(reactContext),
                 new GeolocationModule(reactContext),
                 new GetDistanceModule(reactContext),
@@ -46,7 +47,7 @@ public class BaiduMapPackage implements ReactPackage {
     public List<ViewManager> createViewManagers(
             ReactApplicationContext reactContext) {
         init(reactContext);
-        return Arrays.asList(
+        return Arrays.<ViewManager>asList(
                 new MapViewManager(),
                 new OverlayClusterManager(),
                 new OverlayMarkerManager(),

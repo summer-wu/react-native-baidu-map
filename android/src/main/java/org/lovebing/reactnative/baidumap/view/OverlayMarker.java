@@ -208,17 +208,22 @@ public class OverlayMarker extends View implements OverlayView, ClusterItem {
     }
 
     @Override
-    public void addTopMap(BaiduMap baiduMap) {
+    public void addTopMap(final BaiduMap baiduMap) {
         if (loadingImage) {
-            new Thread(() -> {
-                while (loadingImage) {
-                    try {
-                        Thread.sleep(200);
-                    } catch (InterruptedException e) {
-                        break;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    {
+                        while (loadingImage) {
+                            try {
+                                Thread.sleep(200);
+                            } catch (InterruptedException e) {
+                                break;
+                            }
+                        }
+                        addOverlay(baiduMap);
                     }
                 }
-                addOverlay(baiduMap);
             }).start();
         } else {
             addOverlay(baiduMap);
