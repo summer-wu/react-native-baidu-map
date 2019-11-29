@@ -23,7 +23,6 @@ RCT_EXPORT_VIEW_PROPERTY(zoomGesturesEnabled, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(trafficEnabled, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(baiduHeatMapEnabled, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(clusterEnabled, BOOL)
-RCT_EXPORT_VIEW_PROPERTY(markers, NSArray*)
 RCT_EXPORT_VIEW_PROPERTY(locationData, NSDictionary*)
 RCT_EXPORT_VIEW_PROPERTY(onChange, RCTBubblingEventBlock)
 
@@ -120,7 +119,7 @@ RCT_CUSTOM_VIEW_PROPERTY(center, CLLocationCoordinate2D, BaiduMapView) {
         annotationLabel.backgroundColor = [UIColor greenColor];
         annotationView.alpha = 0.8;
         [annotationView addSubview:annotationLabel];
-        
+
         if (cluster.size == 1) {
             annotationLabel.hidden = YES;
             annotationView.pinColor = BMKPinAnnotationColorRed;
