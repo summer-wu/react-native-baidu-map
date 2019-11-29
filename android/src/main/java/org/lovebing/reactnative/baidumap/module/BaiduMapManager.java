@@ -8,7 +8,7 @@
 package org.lovebing.reactnative.baidumap.module;
 
 import android.util.Log;
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactMethod;
 
