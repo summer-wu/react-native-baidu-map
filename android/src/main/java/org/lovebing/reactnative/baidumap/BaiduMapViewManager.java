@@ -213,6 +213,11 @@ public class BaiduMapViewManager extends SimpleViewManager<MapView> {
       }
 
       @Override
+      public void onMapStatusChangeStart(MapStatus mapStatus, int reason) {
+        onMapStatusChangeStart(mapStatus);
+      }
+
+      @Override
       public void onMapStatusChange(MapStatus mapStatus) {
         sendEvent(mMapView, "onMapStatusChange", getEventParams(mapStatus));
       }
@@ -244,15 +249,15 @@ public class BaiduMapViewManager extends SimpleViewManager<MapView> {
       }
 
       @Override
-      public boolean onMapPoiClick(MapPoi mapPoi) {
+      public void onMapPoiClick(MapPoi mapPoi) {
         WritableMap writableMap = Arguments.createMap();
         writableMap.putString("name", mapPoi.getName());
         writableMap.putString("uid", mapPoi.getUid());
         writableMap.putDouble("latitude", mapPoi.getPosition().latitude);
         writableMap.putDouble("longitude", mapPoi.getPosition().longitude);
         sendEvent(mMapView, "onMapPoiClick", writableMap);
-        return true;
       }
+
     });
 
     mBaiduMap.setOnMapDoubleClickListener(new BaiduMap.OnMapDoubleClickListener() {
