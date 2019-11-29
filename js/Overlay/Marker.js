@@ -25,7 +25,8 @@ export default class Marker extends Component {
     alpha: PropTypes.number,
     rotate: PropTypes.number,
     flat: PropTypes.bool,
-    icon: PropTypes.any
+    icon: PropTypes.any,
+    perspective: PropTypes.bool
   };
 
   static defaultProps = {
