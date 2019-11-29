@@ -1,12 +1,30 @@
+/**
+ * Copyright (c) 2016-present, lovebing.org.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 package org.lovebing.reactnative.baidumap;
 
-import android.content.Context;
+import android.os.Looper;
+import androidx.annotation.MainThread;
+
+import java.util.Arrays;
+import java.util.List;
+
+import com.baidu.mapapi.SDKInitializer;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
+
 import com.facebook.react.uimanager.ViewManager;
-import java.util.Arrays;
-import java.util.List;
+
+import org.lovebing.reactnative.baidumap.module.BaiduMapManager;
+import org.lovebing.reactnative.baidumap.module.GeolocationModule;
+import org.lovebing.reactnative.baidumap.module.GetDistanceModule;
+import org.lovebing.reactnative.baidumap.module.MapAppModule;
+import org.lovebing.reactnative.baidumap.uimanager.*;
 
 
 /**
@@ -14,34 +32,38 @@ import java.util.List;
  */
 public class BaiduMapPackage implements ReactPackage {
 
-  private Context mContext;
+    @Override
+    public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
+        return Arrays.asList(
+                new BaiduMapManager(reactContext),
+                new GeolocationModule(reactContext),
+                new GetDistanceModule(reactContext),
+                new MapAppModule(reactContext)
+        );
+    }
 
-  BaiduMapViewManager baiduMapViewManager;
+    @Override
+    public List<ViewManager> createViewManagers(
+            ReactApplicationContext reactContext) {
+        init(reactContext);
+        return Arrays.asList(
+                new MapViewManager(),
+                new OverlayClusterManager(),
+                new OverlayMarkerManager(),
+                new OverlayOverlayInfoWindowManager(),
+                new OverlayArcManager(),
+                new OverlayCircleManager(),
+                new OverlayPolygonManager(),
+                new OverlayPolylineManager(),
+                new OverlayTextManager()
+        );
+    }
 
-  public BaiduMapPackage(Context context) {
-    this.mContext = context;
-    baiduMapViewManager = new BaiduMapViewManager();
-    baiduMapViewManager.initSDK(context);
-  }
-
-  @Override
-  public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-    return Arrays.<NativeModule>asList(
-        new BaiduMapModule(reactContext),
-        new GeolocationModule(reactContext)
-    );
-  }
-
-  @Override
-  public List<ViewManager> createViewManagers(
-      ReactApplicationContext reactContext) {
-    return Arrays.<ViewManager>asList(
-        baiduMapViewManager
-    );
-  }
-
-//  @Override
-//  public List<Class<? extends JavaScriptModule>> createJSModules() {
-//    return Collections.emptyList();
-//  }
+    @MainThread
+    protected void init(ReactApplicationContext reactContext) {
+        if (Looper.myLooper() == null){
+            Looper.prepare();
+        }
+        SDKInitializer.initialize(reactContext.getApplicationContext());
+    }
 }
