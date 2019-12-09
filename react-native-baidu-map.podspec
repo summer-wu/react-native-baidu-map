@@ -61,5 +61,5 @@ Pod::Spec.new do |s|
   #参考 https://github.com/CocoaPods/Specs/blob/f3fe923154c9d7a8b7e70f6d2be779e758c810d4/Specs/3/7/9/BaiduMapKit/4.2.0/BaiduMapKit.podspec.json
   s.vendored_frameworks = "ios_frameworks/*.framework"
   s.vendored_libraries = "ios_frameworks/thirdlibs/*.a"
-  s.resources= "ios_frameworks/*.framework/*.bundle"
+  s.resources= "ios_frameworks/*.framework/*.bundle","ios_res/*.png"
 end
