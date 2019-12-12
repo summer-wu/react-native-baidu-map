@@ -23,6 +23,9 @@ static BMKGeoCodeSearch *geoCodeSearch;
     _locationManager.activityType = CLActivityTypeAutomotiveNavigation;
     _locationManager.pausesLocationUpdatesAutomatically = YES;
     _locationManager.coordinateType = BMKLocationCoordinateTypeBMK09LL;
+
+    self.clLocMgr = [CLLocationManager new];
+    self.clLocMgr.delegate = self;
     self = [super init];
     return self;
 }
@@ -89,6 +92,43 @@ RCT_EXPORT_METHOD(startLocating:(NSString *)coordType) {
 RCT_EXPORT_METHOD(stopLocating) {
     _locating = false;
     [_locationManager stopUpdatingLocation];
+}
+
++ (NSString *)statusNameFromStatusInt:(CLAuthorizationStatus)st{
+    NSString *stName = @"";
+    if (st == kCLAuthorizationStatusDenied) {
+        stName = @"Denied";
+    } else if(st == kCLAuthorizationStatusNotDetermined) {
+        stName = @"NotDetermined";
+    } else if (st == kCLAuthorizationStatusRestricted){
+        stName = @"Restricted";
+    } else if (st == kCLAuthorizationStatusAuthorizedWhenInUse){
+        stName = @"WhenInUse";
+    } else if (st == kCLAuthorizationStatusAuthorizedAlways){
+        stName = @"Always";
+    } else {
+        stName = @"somethingWrong";
+    }
+    return stName;
+}
+
+RCT_EXPORT_METHOD(getIOSAuthorizationStatus:(int)dontNeed
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject){
+
+    CLAuthorizationStatus st = [CLLocationManager authorizationStatus];
+    NSString *stName = [GeolocationModule statusNameFromStatusInt:st];
+    resolve(stName);
+}
+
+RCT_EXPORT_METHOD(requestWhenInUseAuthorization)
+{
+    [self.clLocMgr requestWhenInUseAuthorization];
+}
+
+RCT_EXPORT_METHOD(requestAlwaysAuthorization)
+{
+    [self.clLocMgr requestAlwaysAuthorization];
 }
 
 RCT_EXPORT_METHOD(getBaiduCoorFromGPSCoor:(double)lat lng:(double)lng
@@ -186,8 +226,8 @@ RCT_EXPORT_METHOD(reverseGeoCodeGPS:(double)lat lng:(double)lng) {
         body[@"errmsg"] = [self getSearchErrorInfo:error];
     }
     [self sendEvent:@"onGetGeoCodeResult" body:body];
-
 }
+
 - (void)onGetReverseGeoCodeResult:(BMKGeoCodeSearch *)searcher result:(BMKReverseGeoCodeSearchResult *)result errorCode:(BMKSearchErrorCode)error {
 
     NSMutableDictionary *body = [self getEmptyBody];
@@ -286,5 +326,14 @@ RCT_EXPORT_METHOD(reverseGeoCodeGPS:(double)lat lng:(double)lng) {
     [self.bridge.eventDispatcher sendDeviceEventWithName:name body:body];
 }
 
+#pragma mark - CLLocationManagerDelegate
+- (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status{
+    NSString *stName = [GeolocationModule statusNameFromStatusInt:status];
+    NSDictionary *d = @{
+                        @"status": stName
+                        };
+    [self sendEvent:@"didChangeAuthorizationStatus" body:d];
+}
 @end
+
 

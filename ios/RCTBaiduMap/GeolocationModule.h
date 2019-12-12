@@ -16,9 +16,11 @@
 #import "BaseModule.h"
 #import "BaiduMapViewManager.h"
 
-@interface GeolocationModule : BaseModule <BMKGeoCodeSearchDelegate, BMKLocationManagerDelegate>
+@interface GeolocationModule : BaseModule <BMKGeoCodeSearchDelegate, BMKLocationManagerDelegate,CLLocationManagerDelegate>
 
 @property (nonatomic) BMKLocationManager *locationManager;
+@property (nonatomic) CLLocationManager *clLocMgr;
+
 @property (nonatomic) bool locating;
 
 - (void)sendEvent:(NSString *)name body:(NSMutableDictionary *)body;

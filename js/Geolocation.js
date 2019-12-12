@@ -5,18 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import {
-  requireNativeComponent,
-  NativeModules,
-  Platform,
-  DeviceEventEmitter
-} from 'react-native';
+import { requireNativeComponent, NativeModules, Platform, DeviceEventEmitter } from 'react-native';
 
-import React, {
-  Component,
-  PropTypes
-} from 'react';
-
+import React, { Component, PropTypes } from 'react';
 
 const _module = NativeModules.BaiduGeolocationModule;
 
@@ -28,23 +19,52 @@ const _locatingUpdateListener = {
   },
   setListener: (listener) => {
     this.listener = listener;
-  }
-}
+  },
+};
 
 export default {
   geocode(city, addr) {
     return new Promise((resolve, reject) => {
       try {
         _module.geocode(city, addr);
-      }
-      catch (e) {
+      } catch (e) {
         reject(e);
         return;
       }
-      DeviceEventEmitter.once('onGetGeoCodeResult', resp => {
+      DeviceEventEmitter.once('onGetGeoCodeResult', (resp) => {
         resolve(resp);
       });
     });
+  },
+  requestWhenInUseAuthorization() {
+    //only ios pass to native
+    if (Platform.OS === 'android') {
+      throw new Error('only ios');
+    }
+    _module.requestWhenInUseAuthorization();
+  },
+  requestAlwaysAuthorization() {
+    //only ios pass to native
+    if (Platform.OS === 'android') {
+      throw new Error('only ios');
+    }
+    _module.requestAlwaysAuthorization();
+  },
+  async getIOSAuthorizationStatus() {
+    //only ios pass to native
+    //返回值就这几个：Denied NotDetermined Restricted WhenInUse Always somethingWrong
+    if (Platform.OS === 'android') {
+      throw new Error('only ios');
+    }
+    return await _module.getIOSAuthorizationStatus(0);
+  },
+  onceAuthStatusChange(funcToRun) {
+    //only ios wait native's event
+    //无需removeListener，这里用的是once收到消息后会自动removeListener
+    if (Platform.OS === 'android') {
+      throw new Error('only ios');
+    }
+    DeviceEventEmitter.once('didChangeAuthorizationStatus', funcToRun);
   },
   convertGPSCoor(lat, lng) {
     return _module.convertGPSCoor(lat, lng);
@@ -53,12 +73,11 @@ export default {
     return new Promise((resolve, reject) => {
       try {
         _module.reverseGeoCode(lat, lng);
-      }
-      catch (e) {
+      } catch (e) {
         reject(e);
         return;
       }
-      DeviceEventEmitter.once('onGetReverseGeoCodeResult', resp => {
+      DeviceEventEmitter.once('onGetReverseGeoCodeResult', (resp) => {
         resolve(resp);
       });
     });
@@ -67,12 +86,11 @@ export default {
     return new Promise((resolve, reject) => {
       try {
         _module.reverseGeoCodeGPS(lat, lng);
-      }
-      catch (e) {
+      } catch (e) {
         reject(e);
         return;
       }
-      DeviceEventEmitter.once('onGetReverseGeoCodeResult', resp => {
+      DeviceEventEmitter.once('onGetReverseGeoCodeResult', (resp) => {
         resp.latitude = parseFloat(resp.latitude);
         resp.longitude = parseFloat(resp.longitude);
         resolve(resp);
@@ -85,16 +103,15 @@ export default {
     } else {
       coorType = coorType.toLowerCase();
     }
-    
+
     return new Promise((resolve, reject) => {
       try {
         _module.getCurrentPosition(coorType);
-      }
-      catch (e) {
+      } catch (e) {
         reject(e);
         return;
       }
-      DeviceEventEmitter.once('onGetCurrentLocationPosition', resp => {
+      DeviceEventEmitter.once('onGetCurrentLocationPosition', (resp) => {
         if (!resp.address) {
           resp.address = `${resp.province} ${resp.city} ${resp.district} ${resp.streetName}`;
         }
@@ -110,12 +127,15 @@ export default {
     }
     _module.startLocating(coorType);
     if (_locatingUpdateListener.handler == null) {
-      _locatingUpdateListener.handler = DeviceEventEmitter.addListener('onLocationUpdate', resp => {
-        if (!resp.address) {
-          resp.address = `${resp.province} ${resp.city} ${resp.district} ${resp.streetName}`;
-        }
-        _locatingUpdateListener.onLocationUpdate(resp);
-      });
+      _locatingUpdateListener.handler = DeviceEventEmitter.addListener(
+        'onLocationUpdate',
+        (resp) => {
+          if (!resp.address) {
+            resp.address = `${resp.province} ${resp.city} ${resp.district} ${resp.streetName}`;
+          }
+          _locatingUpdateListener.onLocationUpdate(resp);
+        },
+      );
     }
     _locatingUpdateListener.setListener(listener);
   },
@@ -125,5 +145,5 @@ export default {
       _locatingUpdateListener.handler.remove();
       _locatingUpdateListener.handler = null;
     }
-  }
+  },
 };
